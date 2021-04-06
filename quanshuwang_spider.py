@@ -1,6 +1,10 @@
 import requests,re,os,time
-#1、获取斗罗大陆html，解码存入book，正则匹配各章连接和章名，存入该chapters
-#2、对每一个章节，解码存入chapter，正则匹配正文，存入该txt，txt叫章名
+#1、遍历每个类，得到每个类的最大页
+#2、遍历每个类的每一页，得到该网页所有“马上阅读”连接
+#3、遍历每个“马上阅读”连接，得到“开始阅读”连接
+#4、若“开始阅读”连接存在，解码存入book，正则匹配各章连接和章名，存入该chapters
+#5、对每一个章节，解码存入chapter，正则匹配正文，存入该txt，txt叫章名
+#6、每次访问网页，停顿一段时间
 x=1
 def classdir(str1:str):
     path=str1
@@ -9,12 +13,16 @@ def classdir(str1:str):
     else:
         os.makedirs(path)
 
-header={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"}
+header={"Your User-Agent"}
 for classes in range(9,12):  #遍历每个类
     class_html='http://www.quanshuwang.com/list/'+str(classes)+'_1.html'
     ##################print(class_html)
-    class_html_o=requests.get(class_html,headers=header).content.decode('gbk')
-    time.sleep(2);
+    try:
+        class_html_o=requests.get(class_html,headers=header).content.decode('gbk')
+        time.sleep(2);
+    except:
+        time.sleep(2);
+        class_html_o=requests.get(class_html,headers=header).content.decode('gbk')
     class_html_reg=re.compile(r'<a href=".*?" class="last">(.*?)</a>',re.S)
     pagemax=class_html_reg.findall(class_html_o)    #得到每个类的最大页
     
